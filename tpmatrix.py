@@ -1,10 +1,14 @@
 from termpixels import App, Color
-from random import uniform, randint 
+from random import uniform, randint, choice
 import sys
 import argparse
 
+CHARS = [
+    *range(0xFF66, 0xFF9E),
+    *range(ord("A"), ord("z"))]
+
 def randchar():
-    return chr(randint(0xFF00, 0xFFEF))
+    return chr(choice(CHARS))
 
 SPEED_MIN = 0.5
 SPEED_MAX = 2
@@ -19,22 +23,24 @@ class Particle:
         self.length = uniform(LENGTH_MIN, LENGTH_MAX)
 
 class MatrixApp(App):
+    def __init__(self):
+        super().__init__(framerate=30)
+
     def on_start(self):
         self.on_resize()
     
     def on_resize(self):
-        self.cols = [Particle() for x in range(self.screen.w // 2)]
+        self.cols = [Particle() for x in range(self.screen.w)]
 
     def on_frame(self):
         for x, p in enumerate(self.cols):
-            px = x * 2
             for i in range(int(p.length) + 1):
                 col = Color.hsl(HUE/360,1,1 - i/p.length)
-                self.screen.at(px, int(p.pos - i), clip=True).fg = col
+                self.screen.at(x, int(p.pos - i + p.speed), clip=True).fg = col
             for i in range(int(p.speed) + 1):
                 pos = p.pos + i
-                self.screen.print(" ", px, int(pos - p.length))
-                self.screen.print(randchar(), px, int(pos), fg=col)
+                self.screen.print(" ", x, int(pos - p.length))
+                self.screen.print(randchar(), x, int(pos))
             p.pos += p.speed
             if p.pos - p.length >= self.screen.h:
                 self.cols[x] = Particle()
