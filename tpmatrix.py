@@ -11,7 +11,7 @@ def randchar():
     return chr(choice(CHARS))
 
 SPEED_MIN = 0.5
-SPEED_MAX = 2
+SPEED_MAX = 1.5
 LENGTH_MIN = 3
 LENGTH_MAX = 8
 HUE = 0.3*360
@@ -31,16 +31,25 @@ class MatrixApp(App):
     
     def on_resize(self):
         self.cols = [Particle() for x in range(self.screen.w)]
+        self.screen.clear(fg=Color.rgb(0,0,0))
 
     def on_frame(self):
         for x, p in enumerate(self.cols):
+            # update colors
             for i in range(int(p.length) + 1):
-                col = Color.hsl(HUE/360,1,1 - i/p.length)
+                col = Color.hsl(HUE/360,1,(1 - i/p.length)**2)
                 self.screen.at(x, int(p.pos - i + p.speed), clip=True).fg = col
+            
+            # render new characters
             for i in range(int(p.speed) + 1):
                 pos = p.pos + i
-                self.screen.print(" ", x, int(pos - p.length))
+                self.screen.print(" ", x, int(pos - p.length), fg=Color.rgb(0,0,0))
                 self.screen.print(randchar(), x, int(pos))
+            
+            # randomly change a character
+            self.screen.print(randchar(), x, int(p.pos + p.speed - randint(1, int(p.length))))
+
+            # move particle
             p.pos += p.speed
             if p.pos - p.length >= self.screen.h:
                 self.cols[x] = Particle()
