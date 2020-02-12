@@ -1,4 +1,5 @@
-from termpixels import App, Color
+from termpixels import Color
+from termpixels.app import LegacyApp
 from random import uniform, randint, choice
 import sys
 import argparse
@@ -22,7 +23,7 @@ class Particle:
         self.speed = uniform(SPEED_MIN, SPEED_MAX)
         self.length = uniform(LENGTH_MIN, LENGTH_MAX)
 
-class MatrixApp(App):
+class MatrixApp(LegacyApp):
     def __init__(self):
         super().__init__(framerate=30)
 
@@ -68,5 +69,5 @@ if __name__ == "__main__":
     LENGTH_MIN = ns.length_min
     LENGTH_MAX = ns.length_max
     HUE = ns.hue
-    MatrixApp().start()
+    MatrixApp().run()
 
